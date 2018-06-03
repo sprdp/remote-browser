@@ -1,0 +1,82 @@
+{
+    "name": "remote-browser",
+    "displayName": "remote-browser",
+    "description": "Browse and edit remote files over sftp",
+    "version": "0.0.1",
+    "publisher": "sprdp",
+    "engines": {
+        "vscode": "^1.23.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:remoteBrowser.connect"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "remote-browser configuration",
+            "properties": {
+                "remoteBrowser.tmpFolder": {
+                    "type": [
+                        "string",
+                        null
+                    ],
+                    "default": null,
+                    "description": "Local temp folder for storing downloaded files. defaults to os.tmpdir()"
+                },
+                "remoteBrowser.connectionOptions": {
+                    "type": "object",
+                    "default": {
+                      "host": "127.0.0.1",
+                      "userame": "user",
+                      "port" : 22
+                    },
+                    "description": "ssh2 Connection args. Supports a subset of the ssh2::ConnectConfig options from the 'ssh2' library\n host  - Remote Host\n port - Port number(Defaults to 22) \nusername  - Username for authentication \n password  - Password for password-based user authentication (NOT RECOMMENDED STORING HERE! EITHER USE KEY-BASED AUTH OR ENTER PASSWORD IN PROMPT)\n agent - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication \n privateKey - Path to a private key for either key-based or hostbased user authentication \n passphrase - For an encrypted private key, this is the passphrase used to decrypt it. \n localHostname - Along with `localUsername` and `privateKey`, set this to a non-empty string for hostbased user authentication \n localUsername - Along with `localHostname` and `privateKey`, set this to a non-empty string for hostbased user authentication"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "remoteBrowser.connect",
+                "title": "remote-browser: Connect"
+            },
+            {
+                "command": "remoteBrowser.changePath",
+                "title": "remote-browser: Change Root Path"
+            },
+            {
+                "command": "remoteBrowser.disconnect",
+                "title": "remote-browser: Disconnect"
+            }
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "remoteExplorer",
+                    "name": "Remote Browser"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "@types/ssh2-sftp-client": "^2.0.1",
+        "ssh2-sftp-client": "^2.2.1"
+    }
+}
