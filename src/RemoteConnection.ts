@@ -43,7 +43,14 @@ export class RemoteConnection extends sftpclient {
 
     private conn(): Promise<void> {
 
+        // Config may change
+        this.config = vscode.workspace.getConfiguration('');
+
         let self = this;
+        // Obtain the private key buffer
+        let pkPath = this.config.get<string>('remoteBrowser.connectionOptions.privateKey');
+        let pkBuffer = pkPath ? fs.readFileSync(pkPath) : undefined;
+        
         let connection_args: ssh2.ConnectConfig = {
             username: this.config.get<string>('remoteBrowser.connectionOptions.username'),
             host: this.config.get<string>('remoteBrowser.connectionOptions.host'),
@@ -52,7 +59,7 @@ export class RemoteConnection extends sftpclient {
             localHostname: this.config.get<string>('remoteBrowser.connectionOptions.localHostname'),
             localUsername: this.config.get<string>('remoteBrowser.connectionOptions.localUsername'),
             passphrase: this.config.get<string>('remoteBrowser.connectionOptions.passphrase'),
-            privateKey: this.config.get<string>('remoteBrowser.connectionOptions.privateKey'),
+            privateKey: pkBuffer,
             agent: this.config.get<string>('remoteBrowser.connectionOptions.agent')
         };
 
@@ -60,7 +67,7 @@ export class RemoteConnection extends sftpclient {
             let connection = self.connect(connection_args).then((res) => {
                 self.connStatus = ConnectionStatus.Connected;
                 self.keepAlive();
-                self.event? self.event.fire() : {};
+                self.event ? self.event.fire() : {};
                 displayNotif('Connected');
             }).catch((e) => {
                 /* Check for an auth failure and prompt for password */

@@ -23,7 +23,19 @@ A lightweight extension that allows you to browse and edit remote files over SFT
 ### Extension Settings
 
 * `remoteBrowser.connectionOptions`: supports a subset of ssh2:ConnectConfig opts from the [ssh2](https://github.com/mscdex/ssh2) library.
-* `remoteBrowser.tmpFolder`: Temporary folder for storing downloaded files
+* Example Config: 
+```json
+
+    "remoteBrowser.connectionOptions": {
+        "host": "12.34.56.78",  // MANDATORY
+        "username": "remoteuser", // MANDATORY
+        "privateKey": "C:/Users/myuser/.ssh/id_rsa",  // Path to private key on local machine
+        "localHostname": "myhost",
+        "localUsername": "myuser"   // Identify as myuser@myhost
+    },
+```
+
+* `remoteBrowser.tmpFolder`: Path to emporary folder for storing downloaded files
 
 See the User Settings file for more info.
 
@@ -41,5 +53,10 @@ See the User Settings file for more info.
 ### 0.5.0
 
 Initial release 
+
+### 0.5.1
+
+* Changed privateKey connection option to be a file path instead of an actual key string.
+* Fixed config file not being read after initialization.
 
 -----------------------------------------------------------------------------------------------------------
