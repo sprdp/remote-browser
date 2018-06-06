@@ -52,6 +52,11 @@ export function activate(context: vscode.ExtensionContext) {
         remoteTree.getFile(path);
     });
 
+    // Register makeRoot
+    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.makeRoot", (node: any) => {
+        remoteTree.changePath(node.remotePath);
+    }));
+
     context.subscriptions.push(cpCmd);
     context.subscriptions.push(opCmd);
     context.subscriptions.push(connCmd);

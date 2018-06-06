@@ -2,7 +2,7 @@
     "name": "remote-browser",
     "displayName": "remote-browser",
     "description": "Browse and edit remote files over sftp",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "publisher": "sprdp",
 	"license": "MIT",
 	"author": "Supradeep Allu <supradeep95@gmail.com>",
@@ -54,6 +54,10 @@
                 "title": "remote-browser: Change Root Path"
             },
             {
+                "command": "remoteBrowser.makeRoot",
+                "title": "remote-browser: Make root"
+            },
+            {
                 "command": "remoteBrowser.disconnect",
                 "title": "remote-browser: Disconnect"
             }
@@ -63,6 +67,15 @@
                 {
                     "id": "remoteExplorer",
                     "name": "Remote Browser"
+                }
+            ]
+        },
+        "menus": {
+            "view/item/context": [
+                {
+                  "command": "remoteBrowser.makeRoot",
+                  "when": "view == remoteExplorer",
+                  "group": "navigation"
                 }
             ]
         }

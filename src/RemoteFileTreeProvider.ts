@@ -80,7 +80,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         }
         // Add the back option only to the root element
         else {
-            return [new FileNode('..', false, undefined)].concat(await this.remoteConnection.get_list(this.root));
+            return [new FileNode('..', false, this.root)].concat(await this.remoteConnection.get_list(this.root));
         }
 
     }
