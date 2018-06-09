@@ -36,6 +36,10 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         this._onDidChangeTreeData.fire();
     }
 
+    public filter(query: string | undefined) {
+        this.remoteConnection.setFilter(query);
+        this._onDidChangeTreeData.fire();
+    }
 
     public async getFile(remotePath: string) {
         try {
@@ -60,7 +64,6 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         });
 
     }
-
 
     public getTreeItem(element: FileNode) {
         return element;

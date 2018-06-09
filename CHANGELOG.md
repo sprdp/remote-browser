@@ -1,7 +1,11 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
-### 0.5.1
+### 0.5.3
+* Added a default sort - Folders first and alphabetical.
+* Added a filter option that allows filtering the current root folder by specifying a regex to test all filenames for. Might change this to a glob in the future.
+
+### 0.5.2
 
 * Added context menu option - Make root (Use on any subdirectory to make it the new root for the explorer tree)
 * Fixed Bug where the '..'back option wasn't getting updated on root change.

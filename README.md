@@ -43,14 +43,24 @@ See the User Settings file for more info.
 * The extenstion relies on [ssh2-sftp-client](https://github.com/jyu213/ssh2-sftp-client) for remote connections.
 * Depending on your workflow, the extension is most effective when used along with an ssh client running in the terminal. Even better if you also use [remote-vscode](https://github.com/rafaelmaiolla/remote-vscode).
 
+
 ## Roadmap
 * Tests
-* More UI elements (Context-menu etc. )
+* More Sort options.
+* Multiple server configurations.
+* Improved filtering.
 * More robust error handling
+
+## Contributing
+Feel free to open an issue or drop a pull request!
 
 ## Release Notes
 
-### 0.5.1
+### 0.5.3
+* Added a default sort - Folders first and alphabetical.
+* Added a filter option that allows filtering the current root folder by specifying a regex to test all filenames for. Might change this to a glob in the future.
+
+### 0.5.2
 
 * Added context menu option - Make root (Use on any subdirectory to make it the new root for the explorer tree)
 * Fixed Bug where the '..'back option wasn't getting updated on root change.

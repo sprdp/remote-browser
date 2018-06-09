@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
     let connActivated = false;
     let config = vscode.workspace.getConfiguration('');
     let remoteTree: RemoteFileTreeProvider = new RemoteFileTreeProvider(config);
-    
+
     context.subscriptions.push(vscode.commands.registerCommand('remoteBrowser.disconnect', () => {
         remoteTree.endSession()
             .then(() => displayNotif('Disconnected'))
@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
             first call to remoteBrowser.connect by RemoteFileTreeProvider's constructor.
             connActivated is required to ensure remoteTree.connect() is called only on subsequent calls.
             Hacky, I know. */
-        if(connActivated) {
+        if (connActivated) {
             remoteTree.connect();
         }
         connActivated = true;
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Register Path change Command
     let cpCmd = vscode.commands.registerCommand("remoteBrowser.changePath", (path: string) => {
         // If command is invoked by user, prompt for path
-        if(!path) {
+        if (!path) {
             vscode.window.showInputBox({ placeHolder: 'Enter Absolute Remote Path' }).then(p => {
                 remoteTree.changePath(p ? p : '.');
             });
@@ -44,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
         else {
             remoteTree.changePath(path);
         }
-        
+
     });
 
     // Register Path change Command
@@ -52,9 +52,19 @@ export function activate(context: vscode.ExtensionContext) {
         remoteTree.getFile(path);
     });
 
+    // Register filter
+    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.filter", () => {
+        vscode.window.showInputBox({ placeHolder: 'Enter Filter Regex. Leave blank to clear filter' }).then(p => {
+            remoteTree.filter(p);
+        });
+    }));
+
     // Register makeRoot
     context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.makeRoot", (node: any) => {
-        remoteTree.changePath(node.remotePath);
+        if(node) {
+            remoteTree.changePath(node.remotePath);
+        }
+        
     }));
 
     context.subscriptions.push(cpCmd);

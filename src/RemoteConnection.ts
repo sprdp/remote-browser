@@ -19,6 +19,7 @@ export enum ConnectionStatus {
 export class RemoteConnection extends sftpclient {
 
     connection: Promise<void>;
+    filter?: RegExp | undefined;
     config: vscode.WorkspaceConfiguration;
     // An event to fire after the connection is successful
     event?: vscode.EventEmitter<FileNode | null | undefined>;
@@ -50,7 +51,7 @@ export class RemoteConnection extends sftpclient {
         // Obtain the private key buffer
         let pkPath = this.config.get<string>('remoteBrowser.connectionOptions.privateKey');
         let pkBuffer = pkPath ? fs.readFileSync(pkPath) : undefined;
-        
+
         let connection_args: ssh2.ConnectConfig = {
             username: this.config.get<string>('remoteBrowser.connectionOptions.username'),
             host: this.config.get<string>('remoteBrowser.connectionOptions.host'),
@@ -90,6 +91,16 @@ export class RemoteConnection extends sftpclient {
 
     }
 
+    public setFilter(regexQuery: string | undefined) {
+        try {
+            this.filter = regexQuery ? new RegExp(regexQuery) : undefined;
+        }
+        catch (e) {
+            logError(e);
+            displayError('Regex Error');
+        }
+    }
+
 
 
     /* sftp-ls on directory path*/
@@ -102,9 +113,27 @@ export class RemoteConnection extends sftpclient {
             logError(e);
             displayError('Error in obtaining directory contents');
         }
-        return file_list.map((elem) => {
-            return new FileNode(elem.name, elem.type === 'd', dirPath);
-        });
+        return file_list.filter((a) => this.filter ? this.filter.test(a.name) : true)
+            .sort((a, b) => {
+                let name1 = a.name.toLowerCase(), name2 = b.name.toLowerCase();
+                // Default Sort option - Alphabetical and Folders first
+                if(a.type === 'd' && b.type !== 'd') {
+                    return -1;
+                }
+                if(b.type === 'd' && a.type !== 'd') {
+                    return 1;
+                }
+                if (name1 < name2) {
+                    return -1;
+                }
+                if (name1 > name2) {
+                    return 1;
+                }
+                return 0;
+            })
+            .map((elem) => {
+                return new FileNode(elem.name, elem.type === 'd', dirPath);
+            });
     }
 
     private get_local_dir() {
