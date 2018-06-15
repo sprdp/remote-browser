@@ -157,23 +157,30 @@ export class RemoteConnection extends sftpclient {
     /* sftp-get on file path. Returns a local file path containing contents of remote file */
     public async get_file(remotePath: string) {
         var fileStream = null;
+        const filename = remotePath.split('/').slice(-1)[0];
+        const localFilePath = path.join(this.get_local_dir(), filename);
+
+        // Remove local file if it exists before getting remote file
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath)
+        }
+
         try {
-            fileStream = (await this.get(remotePath)).read();
+            fileStream = (await this.get(remotePath));
+
+            fileStream.on('data', (chunk) => {
+                fs.appendFile(localFilePath, chunk, function (err) {
+                    if (err) {
+                        logError(err.message);
+                        displayError('Error in Writing file to local path. Check console for details');
+                    }
+                });
+            })
         }
         catch (e) {
             logError(e);
             displayError('Error in downloading file');
         }
-
-        const filename = remotePath.split('/').slice(-1)[0];
-        const localFilePath = path.join(this.get_local_dir(), filename);
-
-        fs.writeFile(localFilePath, fileStream, function (err) {
-            if (err) {
-                logError(err.message);
-                displayError('Error in Writing file to local path. Check console for details');
-            }
-        });
 
         return localFilePath;
     }
