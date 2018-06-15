@@ -168,14 +168,14 @@ export class RemoteConnection extends sftpclient {
         try {
             fileStream = (await this.get(remotePath));
 
-            fileStream.on('data', (chunk) => {
+            fileStream.on('data', (chunk: string) => {
                 fs.appendFile(localFilePath, chunk, function (err) {
                     if (err) {
                         logError(err.message);
                         displayError('Error in Writing file to local path. Check console for details');
                     }
                 });
-            })
+            });
         }
         catch (e) {
             logError(e);
