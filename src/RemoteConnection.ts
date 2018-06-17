@@ -162,13 +162,13 @@ export class RemoteConnection extends sftpclient {
 
         // Remove local file if it exists before getting remote file
         if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath)
+            fs.unlinkSync(localFilePath);
         }
 
         try {
             fileStream = (await this.get(remotePath));
 
-            fileStream.on('data', (chunk) => {
+            fileStream.on('data', (chunk: any) => {
                 fs.appendFile(localFilePath, chunk, function (err) {
                     if (err) {
                         logError(err.message);
