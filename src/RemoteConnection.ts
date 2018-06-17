@@ -175,7 +175,7 @@ export class RemoteConnection extends sftpclient {
                         displayError('Error in Writing file to local path. Check console for details');
                     }
                 });
-            })
+            });
         }
         catch (e) {
             logError(e);
