@@ -166,8 +166,10 @@ export class RemoteConnection extends sftpclient {
         }
 
         try {
-            fileStream = (await this.get(remotePath));
+            // Create an empty file before append to handle empty chunks
+            fs.closeSync(fs.openSync(localFilePath, 'w'));
 
+            fileStream = (await this.get(remotePath));
             fileStream.on('data', (chunk: any) => {
                 fs.appendFile(localFilePath, chunk, function (err) {
                     if (err) {

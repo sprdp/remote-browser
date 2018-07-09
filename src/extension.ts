@@ -62,7 +62,8 @@ export function activate(context: vscode.ExtensionContext) {
     // Register makeRoot
     context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.makeRoot", (node: any) => {
         if(node) {
-            remoteTree.changePath(node.remotePath);
+            // If target is a file, route to parent directory of the file
+            remoteTree.changePath(node.isDir ? node.remotePath : node.parent.remotePath);
         }
         
     }));

@@ -4,10 +4,12 @@ import { TreeItem, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
 export class FileNode extends TreeItem {
     fileStream?: Promise<NodeJS.ReadableStream>;
     remotePath: string;
+    isDir: boolean;
     parent: FileNode | undefined;
 
     constructor(filename: string, isDir: boolean, parent: FileNode | undefined) {
         super(filename);
+        this.parent = parent;
         if(parent) {
             const parent_root = parent ? parent.remotePath : '.';
             this.remotePath = parent_root + '/' + filename;
@@ -16,6 +18,7 @@ export class FileNode extends TreeItem {
             this.remotePath = filename;
         }
 
+        this.isDir = isDir;
         this.collapsibleState = isDir ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None;
         this.iconPath = ThemeIcon.Folder;
         // Associate a change in tree root path with ..
