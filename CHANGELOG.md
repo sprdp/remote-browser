@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
+### 0.5.6
+* Bug fixes. Thanks to @ronsano
+
+### 0.5.5
+* Adds large file support. Thanks to @kimulimuli
+
 ### 0.5.3
 * Added a default sort - Folders first and alphabetical.
 * Added a filter option that allows filtering the current root folder by specifying a regex to test all filenames for. Might change this to a glob in the future.
