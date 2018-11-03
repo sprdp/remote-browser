@@ -1,13 +1,13 @@
 'use strict';
 import * as vscode from 'vscode';
 import { logError, displayError, displayNotif } from './Common';
+import * as ssh2 from 'ssh2';
 
 
 import { RemoteFileTreeProvider } from './RemoteFileTreeProvider';
 
 
 export function activate(context: vscode.ExtensionContext) {
-    let connActivated = false;
     let config = vscode.workspace.getConfiguration('');
     let remoteTree: RemoteFileTreeProvider = new RemoteFileTreeProvider(config);
 
@@ -23,14 +23,27 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register Connect Command
     let connCmd = vscode.commands.registerCommand('remoteBrowser.connect', () => {
-        /*  remoteConnection is implicitly created on 
-            first call to remoteBrowser.connect by RemoteFileTreeProvider's constructor.
-            connActivated is required to ensure remoteTree.connect() is called only on subsequent calls.
-            Hacky, I know. */
-        if (connActivated) {
-            remoteTree.connect();
-        }
-        connActivated = true;
+
+        // Config may change
+        config = vscode.workspace.getConfiguration('');
+
+        let hosts: string[] = [];
+        let remoteBrowserConnectionOptions: any = config.get('remoteBrowser.connectionOptions');
+
+        // Get all configured hosts and show in QuickPick
+        remoteBrowserConnectionOptions.forEach((connectConfig: ssh2.ConnectConfig) => {
+            hosts.push(connectConfig.host!);
+        });
+
+        vscode.window.showQuickPick(hosts, {placeHolder: 'Select Target Host'}).then(p => {
+
+            // Get configuration for selected host and pass to remoteTree.connect
+            remoteBrowserConnectionOptions.forEach((connectConfig: ssh2.ConnectConfig) => {
+                if (p === connectConfig.host) {
+                    remoteTree.connect(config, connectConfig);
+                }
+            });
+        });
     });
 
     // Register Path change Command

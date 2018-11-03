@@ -2,26 +2,25 @@ import { TreeItem, TreeDataProvider } from "vscode";
 import { RemoteConnection, ConnectionStatus } from './RemoteConnection';
 import { FileNode } from './FileNode';
 import * as vscode from 'vscode';
-
+import * as ssh2 from 'ssh2';
 
 
 export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
     
 
-    private remoteConnection: RemoteConnection;
-    private config: vscode.WorkspaceConfiguration;
+    private remoteConnection!: RemoteConnection;
+    private config!: vscode.WorkspaceConfiguration;
     private root: FileNode = new FileNode('.', true, undefined);
     public _onDidChangeTreeData: vscode.EventEmitter<FileNode | null | undefined> = new vscode.EventEmitter<FileNode | null | undefined>();
     public readonly onDidChangeTreeData: vscode.Event<FileNode | null | undefined> = this._onDidChangeTreeData.event;
 
 
     constructor(config: vscode.WorkspaceConfiguration) {
-        this.config = config;
-        this.remoteConnection = new RemoteConnection(config, this._onDidChangeTreeData);
     }
 
-    public connect() {
-        this.remoteConnection = new RemoteConnection(this.config, this._onDidChangeTreeData);
+    public connect(config: vscode.WorkspaceConfiguration, connectConfig: ssh2.ConnectConfig) {
+        this.config = config;
+        this.remoteConnection = new RemoteConnection(this.config, connectConfig, this._onDidChangeTreeData);
     }
 
     public endSession() {
@@ -74,6 +73,10 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         /* Handling connection promises gets iffy due to multiple failure and race conditions. 
            Instead, we wait for onDidChangeTreeData to be fired after a connection is successful
         */
+        if(!this.remoteConnection) {
+            return [];
+        }
+
         if(this.remoteConnection.connStatus !== ConnectionStatus.Connected) {
             return [];
         }

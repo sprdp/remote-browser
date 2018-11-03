@@ -26,11 +26,11 @@ export class RemoteConnection extends sftpclient {
     event?: vscode.EventEmitter<FileNode | null | undefined>;
     connStatus: ConnectionStatus = ConnectionStatus.Off;
 
-    constructor(config: vscode.WorkspaceConfiguration, event?: vscode.EventEmitter<FileNode | null | undefined>) {
+    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ssh2.ConnectConfig, event?: vscode.EventEmitter<FileNode | null | undefined>) {
         super();
         this.config = config;
         this.event = event;
-        this.connection = this.conn();
+        this.connection = this.conn(connectConfig);
     }
 
     // Keep sftp session alive by sending dummy GET packets every 60 seconds
@@ -43,7 +43,7 @@ export class RemoteConnection extends sftpclient {
         }, 60000);
     }
 
-    private conn(): Promise<void> {
+    private conn(connectConfig: ssh2.ConnectConfig): Promise<void> {
 
         // Config may change
         this.config = vscode.workspace.getConfiguration('');
@@ -53,20 +53,10 @@ export class RemoteConnection extends sftpclient {
         let pkPath = this.config.get<string>('remoteBrowser.connectionOptions.privateKey');
         let pkBuffer = pkPath ? fs.readFileSync(pkPath) : undefined;
 
-        let connection_args: ssh2.ConnectConfig = {
-            username: this.config.get<string>('remoteBrowser.connectionOptions.username'),
-            host: this.config.get<string>('remoteBrowser.connectionOptions.host'),
-            password: this.config.get<string>('remoteBrowser.connectionOptions.password'),
-            port: this.config.get<number>('remoteBrowser.connectionOptions.port'),
-            localHostname: this.config.get<string>('remoteBrowser.connectionOptions.localHostname'),
-            localUsername: this.config.get<string>('remoteBrowser.connectionOptions.localUsername'),
-            passphrase: this.config.get<string>('remoteBrowser.connectionOptions.passphrase'),
-            privateKey: pkBuffer,
-            agent: this.config.get<string>('remoteBrowser.connectionOptions.agent')
-        };
+        connectConfig.privateKey = pkBuffer;
 
         var connect_with_args = function (args: ssh2.ConnectConfig) {
-            let connection = self.connect(connection_args).then((res) => {
+            let connection = self.connect(connectConfig).then((res) => {
                 self.connStatus = ConnectionStatus.Connected;
                 self.keepAlive();
                 self.event ? self.event.fire() : {};
@@ -91,7 +81,7 @@ export class RemoteConnection extends sftpclient {
             return connection;
         };
 
-        return connect_with_args(connection_args);
+        return connect_with_args(connectConfig);
 
     }
 
