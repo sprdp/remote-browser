@@ -6,6 +6,15 @@ import * as ssh2 from 'ssh2';
 
 import { RemoteFileTreeProvider } from './RemoteFileTreeProvider';
 
+// Quick pick item
+class QPItem implements vscode.QuickPickItem {
+    public label: string;
+    public config: ssh2.ConnectConfig;
+    constructor(config: ssh2.ConnectConfig) {
+        this.label = config.username + '@' + config.host;
+        this.config = config;
+    }
+}
 
 export function activate(context: vscode.ExtensionContext) {
     let config = vscode.workspace.getConfiguration('');
@@ -27,23 +36,25 @@ export function activate(context: vscode.ExtensionContext) {
         // Config may change
         config = vscode.workspace.getConfiguration('');
 
-        let hosts: string[] = [];
+        let hosts: QPItem[] = [];
         let remoteBrowserConnectionOptions: any = config.get('remoteBrowser.connectionOptions');
+        let additionalConnections: Array<any> | undefined = config.get('remoteBrowser.additionalConnections');
 
-        // Get all configured hosts and show in QuickPick
-        remoteBrowserConnectionOptions.forEach((connectConfig: ssh2.ConnectConfig) => {
-            hosts.push(connectConfig.host!);
-        });
-
-        vscode.window.showQuickPick(hosts, {placeHolder: 'Select Target Host'}).then(p => {
-
-            // Get configuration for selected host and pass to remoteTree.connect
-            remoteBrowserConnectionOptions.forEach((connectConfig: ssh2.ConnectConfig) => {
-                if (p === connectConfig.host) {
-                    remoteTree.connect(config, connectConfig);
+        if(additionalConnections && additionalConnections.length > 0) {
+            // Show quick pick if additional connections are configured
+            hosts.push(new QPItem(remoteBrowserConnectionOptions));
+            additionalConnections.forEach((connectConfig: ssh2.ConnectConfig) => {
+                hosts.push(new QPItem(connectConfig));
+            });
+            vscode.window.showQuickPick(hosts, {placeHolder: 'Select Configured connection'}).then(qp => {
+                if(qp) {
+                    remoteTree.connect(config, qp.config);
                 }
             });
-        });
+        }
+        else {
+            remoteTree.connect(config, remoteBrowserConnectionOptions);
+        }
     });
 
     // Register Path change Command

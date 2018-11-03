@@ -50,7 +50,7 @@ export class RemoteConnection extends sftpclient {
 
         let self = this;
         // Obtain the private key buffer
-        let pkPath = this.config.get<string>('remoteBrowser.connectionOptions.privateKey');
+        let pkPath = connectConfig.privateKey ? String(connectConfig.privateKey) : undefined;
         let pkBuffer = pkPath ? fs.readFileSync(pkPath) : undefined;
 
         connectConfig.privateKey = pkBuffer;

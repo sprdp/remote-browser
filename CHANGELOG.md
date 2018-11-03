@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
+### 0.6
+* Added support for multiple connections.
+* Fixed issue of password prompt being undismissable.
+* Fixed issue of files of the same name in different folders being considered the same.
+
 ### 0.5.6
 * Bug fixes. Thanks to @ronsano
 

@@ -33,6 +33,11 @@ A lightweight extension that allows you to browse and edit remote files over SFT
         "localHostname": "myhost",
         "localUsername": "myuser"   // Identify as myuser@myhost
     },
+    // Optional array to configure additional connections 
+    "remoteBrowser.additionalConnections": [{
+        "host": "12.34.56.79",  
+        "username": "remoteuser2", 
+    }],
 ```
 
 * `remoteBrowser.tmpFolder`: Path to emporary folder for storing downloaded files
@@ -55,6 +60,10 @@ See the User Settings file for more info.
 Feel free to open an issue or drop a pull request!
 
 ## Release Notes
+### 0.6
+* Added support for multiple connections.
+* Fixed issue of password prompt being undismissable.
+* Fixed issue of files of the same name in different folders being considered the same.
 
 ### 0.5.6
 * Bug fixes. Thanks to @ronsano

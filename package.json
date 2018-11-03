@@ -2,7 +2,7 @@
     "name": "remote-browser",
     "displayName": "remote-browser",
     "description": "Browse and edit remote files over sftp",
-    "version": "0.5.6",
+    "version": "0.6.0",
     "publisher": "sprdp",
 	"license": "MIT",
 	"author": "Supradeep Allu <supradeep95@gmail.com>",
@@ -35,33 +35,19 @@
                     "description": "Local temp folder for storing downloaded files. defaults to os.tmpdir()"
                 },
                 "remoteBrowser.connectionOptions": {
-                    "type": "array",
-                    "description": "ssh2 Connection args. Supports a subset of the ssh2::ConnectConfig options from the 'ssh2' library\n host  - Remote Host\n port - Port number(Defaults to 22) \nusername  - Username for authentication \n password  - Password for password-based user authentication (NOT RECOMMENDED STORING HERE! EITHER USE KEY-BASED AUTH OR ENTER PASSWORD IN PROMPT)\n agent - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication \n privateKey - Path to a private key file for either key-based or hostbased user authentication \n passphrase - For an encrypted private key, this is the passphrase used to decrypt it. \n localHostname - Along with `localUsername` and `privateKey`, set this to a non-empty string for hostbased user authentication \n localUsername - Along with `localHostname` and `privateKey`, set this to a non-empty string for hostbased user authentication",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "host": {
-                                "type": "string",
-                                "description": "sftp hostname"
-                            },
-                            "username": {
-                                "type": "string",
-                                "description": "sftp username"
-                            }
-                        }
+                    "type": "object",
+                    "default": {
+                      "host": "127.0.0.1",
+                      "username": "user"
                     },
-                    "default": [    
-                        {
-                            "host": "127.0.0.1",
-                            "username": "user1"
-                        },
-                        {
-                            "host": "127.0.0.2",
-                            "username": "user2"
-                        }
-                    ]
+                    "description": "ssh2 Connection args. Supports a subset of the ssh2::ConnectConfig options from the 'ssh2' library\n host  - Remote Host\n port - Port number(Defaults to 22) \nusername  - Username for authentication \n password  - Password for password-based user authentication (NOT RECOMMENDED STORING HERE! EITHER USE KEY-BASED AUTH OR ENTER PASSWORD IN PROMPT)\n agent - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication \n privateKey - Path to a private key file for either key-based or hostbased user authentication \n passphrase - For an encrypted private key, this is the passphrase used to decrypt it. \n localHostname - Along with `localUsername` and `privateKey`, set this to a non-empty string for hostbased user authentication \n localUsername - Along with `localHostname` and `privateKey`, set this to a non-empty string for hostbased user authentication"
+                },
+                "remoteBrowser.additionalConnections": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Array of additional connections. Members must be objects of the same type as remoteBrowser.connectionOptions."
+                    }
                 }
-            }
         },
         "commands": [
             {
