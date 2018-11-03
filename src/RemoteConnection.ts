@@ -2,6 +2,7 @@ import * as sftpclient from 'ssh2-sftp-client';
 import * as ssh2 from 'ssh2';
 import { FileNode } from './FileNode';
 import * as fs from 'fs';
+import {createHash} from 'crypto';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -74,6 +75,9 @@ export class RemoteConnection extends sftpclient {
                 /* Check for an auth failure and prompt for password */
                 if (e.level === 'client-authentication') {
                     vscode.window.showInputBox({ placeHolder: `Password for ${args.username}@${args.host}`, password: true }).then(pwd => {
+                        if(pwd === undefined) {
+                            return;
+                        }
                         args.password = pwd;
                         connect_with_args(args);
                     });
@@ -85,7 +89,7 @@ export class RemoteConnection extends sftpclient {
 
             });
             return connection;
-        }
+        };
 
         return connect_with_args(connection_args);
 
@@ -136,21 +140,33 @@ export class RemoteConnection extends sftpclient {
             });
     }
 
-    private get_local_dir() {
-        let conf_dir = this.config.get<string>('remoteBrowser.tmpFolder');
-        if (!conf_dir) {
-            return os.tmpdir();
-        }
-        try {
-            // Create directory if it does not exist
-            if (!fs.existsSync(conf_dir)) {
-                fs.mkdirSync(conf_dir);
+    private get_local_dir(remotePath: string) {
+
+        // Create directory if it does not exist
+        function createDir(dir: string) {
+            try {
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir);
+                }
+            } catch (e) {
+                displayError('Error in obtaining local Directory. Make sure path is correct.');
+                logError(e);
             }
-        } catch (e) {
-            displayError('Error in obtaining local Directory. Make sure path is correct.');
-            logError(e);
         }
 
+        let conf_dir = this.config.get<string>('remoteBrowser.tmpFolder');
+        if (!conf_dir) {
+            conf_dir =  os.tmpdir();
+        }
+        else {
+            createDir(conf_dir);
+        }
+
+        /*  Use a hash of the remote path to create a local directory for a file.
+            Ensures that no conflict occurs on different files with the same name */
+        const loc_dir = createHash('md5').update(remotePath).digest('hex').slice(0, 4);
+        conf_dir = conf_dir + '/' + loc_dir;
+        createDir(conf_dir);
         return conf_dir;
     }
 
@@ -158,7 +174,7 @@ export class RemoteConnection extends sftpclient {
     public async get_file(remotePath: string) {
         var fileStream = null;
         const filename = remotePath.split('/').slice(-1)[0];
-        const localFilePath = path.join(this.get_local_dir(), filename);
+        const localFilePath = path.join(this.get_local_dir(remotePath), filename);
 
         // Remove local file if it exists before getting remote file
         if (fs.existsSync(localFilePath)) {
