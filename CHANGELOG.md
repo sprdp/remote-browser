@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
+### 0.7
+* Bottom status bar now displays file saving status.
+* Added a defaultPath option which specifies a default directory to cd into on initial connect.
+
 ### 0.6
 * Added support for multiple connections.
 * Fixed issue of password prompt being undismissable.

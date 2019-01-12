@@ -4,3 +4,4 @@ import * as ssh2 from 'ssh2';
 export interface ConnConfig extends ssh2.ConnectConfig {
     defaultPath?: string;
 }
+

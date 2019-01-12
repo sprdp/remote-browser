@@ -6,7 +6,7 @@ import {createHash} from 'crypto';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { logError, displayError, displayNotif } from './Common';
+import { logError, displayError, displayNotif, StatusBarItem } from './Common';
 
 
 export enum ConnectionStatus {
@@ -25,12 +25,15 @@ export class RemoteConnection extends sftpclient {
     // An event to fire after the connection is successful
     event?: vscode.EventEmitter<FileNode | null | undefined>;
     connStatus: ConnectionStatus = ConnectionStatus.Off;
+    statusBar: StatusBarItem
 
-    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event?: vscode.EventEmitter<FileNode | null | undefined>) {
+    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event: vscode.EventEmitter<FileNode | null | undefined>,
+        callback: () => void) {
         super();
+        this.statusBar = new StatusBarItem();
         this.config = config;
         this.event = event;
-        this.connection = this.conn(connectConfig);
+        this.connection = this.conn(connectConfig, callback);
     }
 
     // Keep sftp session alive by sending dummy GET packets every 60 seconds
@@ -43,7 +46,7 @@ export class RemoteConnection extends sftpclient {
         }, 60000);
     }
 
-    private conn(connectConfig: ConnConfig): Promise<void> {
+    private conn(connectConfig: ConnConfig, callback: () => void): Promise<void> {
 
         // Config may change
         this.config = vscode.workspace.getConfiguration('');
@@ -59,7 +62,8 @@ export class RemoteConnection extends sftpclient {
             let connection = self.connect(connectConfig).then((res) => {
                 self.connStatus = ConnectionStatus.Connected;
                 self.keepAlive();
-                self.event ? self.event.fire() : {};
+                self.event ? self.event.fire() : undefined;
+                callback();
                 displayNotif('Connected');
             }).catch((e) => {
                 /* Check for an auth failure and prompt for password */
@@ -195,10 +199,12 @@ export class RemoteConnection extends sftpclient {
 
     /* sftp-put on file path */
     public async put_file(remotePath: string, localPath: string) {
-
+        this.statusBar.updateStatusBarProgress(`Saving file...`);
         this.put(localPath, remotePath, false, 'utf8').then((res) => {
             console.log('File saved to ' + remotePath);
+            this.statusBar.updateStatusBarSuccess(`Saved File successfully in remote`);
         }).catch((err) => {
+            this.statusBar.hide();
             displayError('Error in saving file to remote. Check console for details');
             logError(err);
         });
