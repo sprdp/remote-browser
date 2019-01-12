@@ -1,5 +1,5 @@
 import * as sftpclient from 'ssh2-sftp-client';
-import * as ssh2 from 'ssh2';
+import {ConnConfig} from './ConnConfig';
 import { FileNode } from './FileNode';
 import * as fs from 'fs';
 import {createHash} from 'crypto';
@@ -26,7 +26,7 @@ export class RemoteConnection extends sftpclient {
     event?: vscode.EventEmitter<FileNode | null | undefined>;
     connStatus: ConnectionStatus = ConnectionStatus.Off;
 
-    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ssh2.ConnectConfig, event?: vscode.EventEmitter<FileNode | null | undefined>) {
+    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event?: vscode.EventEmitter<FileNode | null | undefined>) {
         super();
         this.config = config;
         this.event = event;
@@ -43,7 +43,7 @@ export class RemoteConnection extends sftpclient {
         }, 60000);
     }
 
-    private conn(connectConfig: ssh2.ConnectConfig): Promise<void> {
+    private conn(connectConfig: ConnConfig): Promise<void> {
 
         // Config may change
         this.config = vscode.workspace.getConfiguration('');
@@ -55,7 +55,7 @@ export class RemoteConnection extends sftpclient {
 
         connectConfig.privateKey = pkBuffer;
 
-        var connect_with_args = function (args: ssh2.ConnectConfig) {
+        var connect_with_args = function (args: ConnConfig) {
             let connection = self.connect(connectConfig).then((res) => {
                 self.connStatus = ConnectionStatus.Connected;
                 self.keepAlive();

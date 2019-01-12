@@ -31,7 +31,8 @@ A lightweight extension that allows you to browse and edit remote files over SFT
         "username": "remoteuser", // MANDATORY
         "privateKey": "C:/Users/myuser/.ssh/id_rsa",  // Path to private key on local machine
         "localHostname": "myhost",
-        "localUsername": "myuser"   // Identify as myuser@myhost
+        "localUsername": "myuser",   // Identify as myuser@myhost
+        "defaultPath": "/usr/local/bin" // Default directory to start in on connect (Absolute path)
     },
     // Optional array to configure additional connections 
     "remoteBrowser.additionalConnections": [{

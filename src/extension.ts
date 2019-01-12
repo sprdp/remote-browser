@@ -1,16 +1,15 @@
 'use strict';
 import * as vscode from 'vscode';
 import { logError, displayError, displayNotif } from './Common';
-import * as ssh2 from 'ssh2';
-
+import {ConnConfig} from './ConnConfig';
 
 import { RemoteFileTreeProvider } from './RemoteFileTreeProvider';
 
 // Quick pick item
 class QPItem implements vscode.QuickPickItem {
     public label: string;
-    public config: ssh2.ConnectConfig;
-    constructor(config: ssh2.ConnectConfig) {
+    public config: ConnConfig;
+    constructor(config: ConnConfig) {
         this.label = config.username + '@' + config.host;
         this.config = config;
     }
@@ -43,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
         if(additionalConnections && additionalConnections.length > 0) {
             // Show quick pick if additional connections are configured
             hosts.push(new QPItem(remoteBrowserConnectionOptions));
-            additionalConnections.forEach((connectConfig: ssh2.ConnectConfig) => {
+            additionalConnections.forEach((connectConfig: ConnConfig) => {
                 hosts.push(new QPItem(connectConfig));
             });
             vscode.window.showQuickPick(hosts, {placeHolder: 'Select Configured connection'}).then(qp => {

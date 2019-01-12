@@ -2,7 +2,7 @@ import { TreeItem, TreeDataProvider } from "vscode";
 import { RemoteConnection, ConnectionStatus } from './RemoteConnection';
 import { FileNode } from './FileNode';
 import * as vscode from 'vscode';
-import * as ssh2 from 'ssh2';
+import {ConnConfig} from './ConnConfig';
 
 
 export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
@@ -18,7 +18,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
     constructor(config: vscode.WorkspaceConfiguration) {
     }
 
-    public connect(config: vscode.WorkspaceConfiguration, connectConfig: ssh2.ConnectConfig) {
+    public connect(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig) {
         this.config = config;
         this.remoteConnection = new RemoteConnection(this.config, connectConfig, this._onDidChangeTreeData);
     }
