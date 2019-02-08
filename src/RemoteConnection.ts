@@ -166,7 +166,7 @@ export class RemoteConnection extends sftpclient {
 
     /* sftp-get on file path. Returns a local file path containing contents of remote file */
     public async get_file(remotePath: string) {
-        var fileStream = null;
+        var fileStream: NodeJS.ReadableStream;
         const filename = remotePath.split('/').slice(-1)[0];
         const localFilePath = path.join(this.get_local_dir(remotePath), filename);
 
