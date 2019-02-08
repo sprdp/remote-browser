@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
+### 0.7.1
+* Fix bug caused by introduction of NodeJs 10.0.
+* Update all dependencies.
+
 ### 0.7
 * Bottom status bar now displays file saving status.
 * Added a defaultPath option which specifies a default directory to cd into on initial connect.

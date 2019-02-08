@@ -25,7 +25,7 @@ export class RemoteConnection extends sftpclient {
     // An event to fire after the connection is successful
     event?: vscode.EventEmitter<FileNode | null | undefined>;
     connStatus: ConnectionStatus = ConnectionStatus.Off;
-    statusBar: StatusBarItem
+    statusBar: StatusBarItem;
 
     constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event: vscode.EventEmitter<FileNode | null | undefined>,
         callback: () => void) {
@@ -180,14 +180,26 @@ export class RemoteConnection extends sftpclient {
             fs.closeSync(fs.openSync(localFilePath, 'w'));
 
             fileStream = (await this.get(remotePath));
-            fileStream.on('data', (chunk: any) => {
-                fs.appendFile(localFilePath, chunk, function (err) {
-                    if (err) {
-                        logError(err.message);
-                        displayError('Error in Writing file to local path. Check console for details');
-                    }
-                });
+            
+            var readChunk = () => {
+                let chunk;
+                while (null !== (chunk = fileStream.read())) {
+                    fs.appendFile(localFilePath, chunk, function (err) {
+                        if (err) {
+                            logError(err.message);
+                            displayError('Error in Writing file to local path. Check console for details');
+                        }
+                    });
+                }
+            };
+
+            // Required because the file get API processes an on('readable') and resolves the promise
+            // Subsequent readble events have to be handled through an event here
+            readChunk();
+            fileStream.on('readable', () => {
+                readChunk();
             });
+
         }
         catch (e) {
             logError(e);

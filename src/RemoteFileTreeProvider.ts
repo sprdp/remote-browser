@@ -27,7 +27,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
             if(connectConfig.defaultPath) {
                 self.changePath(connectConfig.defaultPath);
             }
-        }
+        };
 
         this.config = config;
         this.remoteConnection = new RemoteConnection(this.config, connectConfig, this._onDidChangeTreeData, onConnect);
