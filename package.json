@@ -2,7 +2,7 @@
     "name": "remote-browser",
     "displayName": "remote-browser",
     "description": "Browse and edit remote files over sftp",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "publisher": "sprdp",
     "license": "MIT",
     "author": "Supradeep Allu <supradeep95@gmail.com>",

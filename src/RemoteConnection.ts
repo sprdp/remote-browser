@@ -166,7 +166,6 @@ export class RemoteConnection extends sftpclient {
 
     /* sftp-get on file path. Returns a local file path containing contents of remote file */
     public async get_file(remotePath: string) {
-        var fileStream: NodeJS.ReadableStream;
         const filename = remotePath.split('/').slice(-1)[0];
         const localFilePath = path.join(this.get_local_dir(remotePath), filename);
 
@@ -178,28 +177,30 @@ export class RemoteConnection extends sftpclient {
         try {
             // Create an empty file before append to handle empty chunks
             fs.closeSync(fs.openSync(localFilePath, 'w'));
+            await this.fastGet(remotePath, localFilePath);
+            /*
+                Obsolete file read handling. Using the fastGet API Instead.
 
-            fileStream = (await this.get(remotePath));
-            
-            var readChunk = () => {
+                var readChunk = () => {
                 let chunk;
-                while (null !== (chunk = fileStream.read())) {
-                    fs.appendFile(localFilePath, chunk, function (err) {
-                        if (err) {
-                            logError(err.message);
-                            displayError('Error in Writing file to local path. Check console for details');
-                        }
-                    });
-                }
-            };
+                    while (null !== (chunk = fileStream.read())) {
+                        fs.appendFile(localFilePath, chunk, function (err) {
+                            if (err) {
+                                logError(err.message);
+                                displayError('Error in Writing file to local path. Check console for details');
+                            }
+                        });
+                    }
+                };
 
-            // Required because the file get API processes an on('readable') and resolves the promise
-            // Subsequent readble events have to be handled through an event here
-            readChunk();
-            fileStream.on('readable', () => {
+                // Required because the file get API processes an on('readable') and resolves the promise
+                // Subsequent readble events have to be handled through an event here
                 readChunk();
-            });
+                fileStream.on('readable', () => {
+                    readChunk();
+                });
 
+            */
         }
         catch (e) {
             logError(e);
