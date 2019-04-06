@@ -75,8 +75,18 @@ export class RemoteConnection extends sftpclient {
                         args.password = pwd;
                         connect_with_args(args);
                     });
-                }
-                else {
+                } else if (e.message && e.message.indexOf('no passphrase') > -1) {
+                    vscode.window.showInputBox({ placeHolder: `Passphrase for Encrypted Key`, password: true }).then(pp => {
+                        if(pp === undefined) {
+                            return;
+                        }
+                        args.passphrase = pp;
+                        connect_with_args(args);
+                    });
+                } else if(e.name === 'InvalidAsn1Error') {
+                    displayError('Could not decrpyt private key. Please ensure passphrase is correct');
+                    logError(e);
+                } else {
                     displayError('Error in connection. Check console for details');
                     logError(e);
                 }

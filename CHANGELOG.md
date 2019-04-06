@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to the "remote-browser" extension will be documented in this file.
 
+### 0.7.3
+* Added passphrase prompt.
+
 ### 0.7.2
 * Changed file download handling to use ssh2-streams fastGet. Should be faster and more reliable.
 
